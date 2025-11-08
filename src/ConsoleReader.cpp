@@ -10,24 +10,24 @@ class ConsoleReader : public IReader {
 public:
     ConsoleReader(std::istream &input = std::cin) : m_input{input} {};
 
-    void add_storage(IStorage *storage) override;
+    void add_storage(IStorage *storage) override {};
 
-    void remove_storage(IStorage *storage) override;
+    void remove_storage(IStorage *storage) override {};
 
-     bool read(std::string &line) override {
-        return (bool)std::getline(m_input, line);
+    bool read(std::string &line) override {
+        return (bool) std::getline(m_input, line);
     };
 
-    virtual ~ConsoleReader();
+    ~ConsoleReader() {};
 
 private:
-    void open_brace();
+    void open_brace() {};
 
-    void close_brace();
+    void close_brace() {};
 
-    void notify_end_input();
+    void notify_end_input() {};
 
-    void notify_new_line(const std::string &line);
+    void notify_new_line(const std::string &line) {};
 
     std::istream &m_input;
 };

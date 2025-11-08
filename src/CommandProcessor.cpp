@@ -22,7 +22,7 @@ public:
         }
     };
 
-    virtual ~CommandProcessor() = default;
+    ~CommandProcessor() = default;
 
 private:
     std::shared_ptr<IWriter> writer_;

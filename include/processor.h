@@ -15,13 +15,13 @@
 class IProcessor {
 public:
 
-    virtual void add_writer(IWriter &writer);
+    virtual void add_writer(IWriter &writer) = 0;
 
-    virtual void remove_writer(IWriter &writer);
+    virtual void remove_writer(IWriter &writer) = 0;
 
-    virtual void process_data();
+    virtual void process_data() = 0;
 
-    virtual ~IProcessor() = default;
+    ~IProcessor() = default;
 };
 
 
