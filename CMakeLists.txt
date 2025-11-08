@@ -17,7 +17,7 @@ add_executable(${PROJECT_NAME} ${CPP_SOURCES}
         src/FileWriter.cpp
         src/CommandProcessor.cpp
         src/ConsoleReader.cpp
-
+        src/main.cpp
 )
 
 set(CPACK_GENERATOR DEB)

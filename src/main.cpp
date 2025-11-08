@@ -1,6 +1,6 @@
-#include "src/ConsoleReader.cpp"
-#include "src/FileWriter.cpp"
-#include "src/CommandProcessor.cpp"
+#include "ConsoleReader.cpp"
+#include "FileWriter.cpp"
+#include "CommandProcessor.cpp"
 
 #include <iostream>
 #include <memory>
