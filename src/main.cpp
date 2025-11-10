@@ -5,16 +5,16 @@
 #include <iostream>
 #include <memory>
 
-int main(int argc, char* argv[])
-{
-    std::ifstream in("hello.txt"); // окрываем файл для чтения
-    if (in.is_open())
-    {
-    std::ifstream in("hello.txt");
-    std::shared_ptr<ConsoleReader> consoleReader = std::make_shared<ConsoleReader>(ConsoleReader(in));
-    std::shared_ptr<FileWriter> fileWriter = std::make_shared<FileWriter>(FileWriter("bulk", ".log"));
-    CommandProcessor commandProcessor = CommandProcessor(consoleReader, fileWriter);
-    commandProcessor.process_data();
+int main(int argc, char *argv[]) {
+    std::ifstream in("../bulk_origin.txt");
+    std::ofstream of(
+            "bulk" + std::to_string(std::chrono::duration_cast<std::chrono::nanoseconds>(
+                    std::chrono::high_resolution_clock::now().time_since_epoch()).count()) + ".log", std::ios::app);
+    if (in.is_open()) {
+        std::shared_ptr<ConsoleReader> consoleReader = std::make_shared<ConsoleReader>(ConsoleReader(in));
+        std::shared_ptr<FileWriter> fileWriter = std::make_shared<FileWriter>(FileWriter(of));
+        CommandProcessor commandProcessor = CommandProcessor(consoleReader, fileWriter);
+        commandProcessor.process_data();
     }
-    in.close(); 
+    in.close();
 }
