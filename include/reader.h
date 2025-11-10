@@ -11,9 +11,6 @@
 class IReader
 {
 public:
-    virtual void add_storage(IStorage* storage) = 0;
-
-    virtual void remove_storage(IStorage* storage) = 0;
 
     virtual bool read(std::string &line) = 0;
 

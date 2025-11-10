@@ -11,10 +11,6 @@ public:
     CommandProcessor(std::shared_ptr<IReader> reader, std::shared_ptr<IWriter> writer) : reader_{reader},
                                                                                          writer_{writer} {}
 
-    void add_writer(IWriter &writer) override {};
-
-    void remove_writer(IWriter &writer) override {};
-
     void process_data() override {
         std::string line_;
         while (reader_->read(line_)) {
@@ -27,7 +23,6 @@ public:
 private:
     std::shared_ptr<IWriter> writer_;
     std::shared_ptr<IReader> reader_;
-
 };
 
 

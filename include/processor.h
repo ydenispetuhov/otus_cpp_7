@@ -15,10 +15,6 @@
 class IProcessor {
 public:
 
-    virtual void add_writer(IWriter &writer) = 0;
-
-    virtual void remove_writer(IWriter &writer) = 0;
-
     virtual void process_data() = 0;
 
     ~IProcessor() = default;

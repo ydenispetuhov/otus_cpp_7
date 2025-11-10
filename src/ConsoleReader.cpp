@@ -10,10 +10,6 @@ class ConsoleReader : public IReader {
 public:
     ConsoleReader(std::istream &input = std::cin) : m_input{input} {};
 
-    void add_storage(IStorage *storage) override {};
-
-    void remove_storage(IStorage *storage) override {};
-
     bool read(std::string &line) override {
         return (bool) std::getline(m_input, line);
     };
