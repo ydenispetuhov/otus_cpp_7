@@ -9,13 +9,17 @@
 class FileWriter : public IWriter {
 public:
 
-    // explicit FileWriter(const std::string filename_prefix_, const std::string filename_suffix_) : filename_prefix(filename_prefix_), filename_suffix(filename_suffix_) {}
+    explicit FileWriter(const std::string filename_prefix_, const std::string filename_suffix_) : filename_prefix(filename_prefix_), filename_suffix(filename_suffix_) {}
     
-    FileWriter(std::ofstream& file_) : m_file(std::move(file_)) {}
+    // explicit FileWriter(std::ofstream& file_) : m_file(std::move(file_)) {}
     
     void write(const std::string &str) override {
         makeofstream() << str;
     }
+
+    // void write(const std::string &str) override {
+    //     m_file << str;
+    // }
 
     virtual ~FileWriter() = default;
 
@@ -30,6 +34,6 @@ private:
 
     std::string filename_prefix;
     std::string filename_suffix;
-    std::ofstream m_file;
+    // std::ofstream m_file;
 };
 
