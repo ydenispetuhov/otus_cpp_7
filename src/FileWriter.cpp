@@ -9,9 +9,9 @@
 class FileWriter : public IWriter {
 public:
 
-    explicit FileWriter(const std::string filename_prefix_, const std::string filename_suffix_) : filename_prefix(filename_prefix_), filename_suffix(filename_suffix_) {}
+    // explicit FileWriter(const std::string filename_prefix_, const std::string filename_suffix_) : filename_prefix(filename_prefix_), filename_suffix(filename_suffix_) {}
     
-    explicit FileWriter(std::ofstream& file_) : m_file(std::move(file_)) {}
+    FileWriter(std::ofstream& file_) : m_file(std::move(file_)) {}
     
     void write(const std::string &str) override {
         makeofstream() << str;
