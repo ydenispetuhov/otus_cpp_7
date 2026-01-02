@@ -10,69 +10,67 @@
 
 class MultiThreadCommandProcessor : public IProcessor {
 public:
-    MultiThreadCommandProcessor(const int block_size, const std::shared_ptr<IReader> &reader,
-                                const std::shared_ptr<IWriter> &writer1,
-                                const std::shared_ptr<IWriter> &writer2) : writer_1{writer1},
-                                                                          writer_2{writer2},
-                                                                          reader_{reader},
-                                                                          c_block_size{block_size},
-                                                                          pool{std::move(ThreadPool(4))} {
-    }
+    MultiThreadCommandProcessor(const int block_size, std::shared_ptr<IReader> reader,
+                                std::shared_ptr<IWriter> writer1,
+                                std::shared_ptr<IWriter> writer2) 
+        : c_block_size{block_size},
+          reader_{std::move(reader)},
+          writer_1{std::move(writer1)},
+          writer_2{std::move(writer2)},
+          pool{ThreadPool(4)} {}
 
     void process_data() override {
-        std::string line_;
-        std::string tmp_line_;
-        std::shared_ptr<IWriter> currWriter = writer_1;
-        while (reader_->read(line_)) {
-            if (line_ == "{") {
+        std::string line;
+        std::shared_ptr<IWriter> current_writer = writer_1;
+
+        while (reader_->read(line)) {
+            if (line == "{") {
                 if (stack.empty()) {
-                    while (!queue.empty()) {
-                        tmp_line_.append(queue.front());
-                        queue.pop();
-                    }
-                    tmp_line_.append("\n");
-                    // writer_->write(tmp_line_);
-                    pool.enqueue([currWriter, tmp_line_]() {currWriter->write(tmp_line_);});
+                    flush_queue(current_writer);
                 }
-                stack.push(line_);
-                continue;
-            } else if (line_ == "}") {
+                stack.push(line);
+            } else if (line == "}") {
                 stack.pop();
                 if (stack.empty()) {
-                    while (!queue.empty()) {
-                        tmp_line_.append(queue.front());
-                        queue.pop();
-                    }
-                    tmp_line_.append("\n");
-                    // writer_->write(tmp_line_);
-                    pool.enqueue([currWriter, tmp_line_]() {currWriter->write(tmp_line_);});
+                    flush_queue(current_writer);
+                    // Toggle writer after each complete block
+                    current_writer = (current_writer == writer_1) ? writer_2 : writer_1;
                 }
-                continue;
             } else {
-                queue.push(line_);
+                queue.push(line);
             }
-            if (stack.empty() && queue.size() == c_block_size) {
-                while (!queue.empty()) {
-                    tmp_line_.append(queue.front());
-                    queue.pop();
-                }
-                tmp_line_.append("\n");
-                // writer_->write(tmp_line_);
-                pool.enqueue([currWriter, tmp_line_]() {currWriter->write(tmp_line_);});
+
+            if (stack.empty() && static_cast<int>(queue.size()) >= c_block_size) {
+                flush_queue(current_writer);
+                // Toggle writer after each complete block
+                current_writer = (current_writer == writer_1) ? writer_2 : writer_1;
             }
         }
-    };
+    }
 
     ~MultiThreadCommandProcessor() = default;
 
 private:
+    void flush_queue(std::shared_ptr<IWriter>& writer) {
+        if (queue.empty()) return;
+
+        std::string block;
+        while (!queue.empty()) {
+            block += queue.front();
+            queue.pop();
+        }
+        block += "\n";
+
+        pool.enqueue([writer, block]() {
+            writer->write(block);
+        });
+    }
+
     std::shared_ptr<IWriter> writer_1;
     std::shared_ptr<IWriter> writer_2;
     std::shared_ptr<IReader> reader_;
     std::queue<std::string> queue;
     std::stack<std::string> stack;
     int c_block_size;
-    ThreadPool&& pool;
+    ThreadPool pool;
 };
-
-

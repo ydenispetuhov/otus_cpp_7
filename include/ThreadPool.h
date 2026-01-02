@@ -34,7 +34,7 @@ private:
 inline ThreadPool::ThreadPool(size_t threads)
     :   stop(false)
 {
-    workers.reserve(threads);
+    // workers.reserve(threads);
     for(size_t i = 0;i<threads;++i)
         workers.emplace_back(
             [this]
@@ -57,7 +57,7 @@ inline ThreadPool::ThreadPool(size_t threads)
                 }
             }
         );
-    workers.shrink_to_fit();
+    // workers.shrink_to_fit();
 }
 
 // add new work item to the pool
