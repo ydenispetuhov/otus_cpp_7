@@ -24,6 +24,7 @@ public:
         std::shared_ptr<IWriter> current_file_writer = writer_1;
 
         while (reader_->read(line)) {
+            ltrim(line);
             if (line == "{") {
                 if (stack.empty()) {
                     flush_queue(current_file_writer);
@@ -67,6 +68,20 @@ private:
         pool.enqueue([this, block]() {
             writer_3->write(block);
         });
+    }
+
+    // Trim from the start (in place)
+    static void ltrim(std::string &s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }));
+    }
+
+    // Trim from the end (in place)
+    static void rtrim(std::string &s) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+            return !std::isspace(ch);
+        }).base(), s.end());
     }
 
     std::shared_ptr<IWriter> writer_1;
