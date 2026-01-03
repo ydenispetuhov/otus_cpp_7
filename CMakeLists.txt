@@ -20,6 +20,7 @@ add_executable(${PROJECT_NAME} ${CPP_SOURCES}
         src/main.cpp
         include/ThreadPool.h
         src/MultiThreadCommandProcessor.cpp
+        src/ConsolWriter.cpp
 )
 
 set(CPACK_GENERATOR DEB)

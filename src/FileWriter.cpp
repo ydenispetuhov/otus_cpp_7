@@ -21,7 +21,7 @@ public:
     //     m_file << str;
     // }
 
-    virtual ~FileWriter() = default;
+    ~FileWriter() override = default;
 
 private:
 
