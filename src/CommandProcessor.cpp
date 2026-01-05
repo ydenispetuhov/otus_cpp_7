@@ -51,9 +51,6 @@ public:
 private:
 
     void prepare_command_and_write(std::queue<std::string>& queue, std::shared_ptr<IWriter>& writer) {
-        // std::string result = std::reduce(queue.begin(), queue.end(), " ");
-        // result += "\n";
-        // writer_->write(result);
         std::string result;
         while (!queue.empty()) {
                     result += queue.front();
