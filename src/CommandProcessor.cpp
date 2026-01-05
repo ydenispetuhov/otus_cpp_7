@@ -17,6 +17,10 @@ public:
                                                                                                             reader_{reader},
                                                                                                             writer_{writer} {}
 
+    std::shared_ptr<IReader> get_reader() {
+        return reader_;
+    }
+
     void process_data() override {
         std::string line_;
         while (reader_->read(line_)) {
