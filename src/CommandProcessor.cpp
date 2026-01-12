@@ -13,64 +13,61 @@
 
 class CommandProcessor : public IProcessor {
 public:
-    CommandProcessor(int block_size, std::shared_ptr<IReader> reader, std::shared_ptr<IWriter> writer) :    c_block_size{block_size},
-                                                                                                            reader_{reader},
-                                                                                                            writer_{writer} {}
+    CommandProcessor(int block_size, std::shared_ptr<IReader> reader, std::shared_ptr<IWriter> writer)
+        : c_block_size{block_size}, reader_{std::move(reader)}, writer_{std::move(writer)} {}
 
     std::shared_ptr<IReader> get_reader() {
         return reader_;
     }
 
     void process_data() override {
-        std::string line_;
-        while (reader_->read(line_)) {
-            ltrim(line_);
-            if (line_ == "{") {
+        std::string line;
+        while (reader_->read(line)) {
+            trim(line);
+            if (line.empty()) continue;
+
+            if (line == "{") {
                 if (stack.empty() && !queue.empty()) {
-                    prepare_command_and_write(queue, writer_);
+                    flush_queue();
                 }
-                stack.push(line_);
-                continue;
-            } else if (line_ == "}") {
-                stack.pop();
-                if (stack.empty()) {
-                    prepare_command_and_write(queue, writer_);
+                stack.push(line);
+            } else if (line == "}") {
+                if (!stack.empty()) {
+                    stack.pop();
+                    if (stack.empty()) {
+                        flush_queue();
+                    }
                 }
-                continue;
             } else {
-                queue.push(line_);
-            }
-            if (stack.empty() && queue.size() == c_block_size) {
-                prepare_command_and_write(queue, writer_);
+                queue.push(line);
+                if (stack.empty() && static_cast<int>(queue.size()) >= c_block_size) {
+                    flush_queue();
+                }
             }
         }
-    };
+    }
 
     ~CommandProcessor() = default;
 
 private:
+    void flush_queue() {
+        if (queue.empty()) return;
 
-    void prepare_command_and_write(std::queue<std::string>& queue, std::shared_ptr<IWriter>& writer) {
         std::string result;
         while (!queue.empty()) {
-                    result += queue.front();
-                    result += " ";
-                    queue.pop();
-                }
-                result += "\n";
-                writer_->write(result);
+            result += queue.front();
+            queue.pop();
+            if (!queue.empty()) result += " ";
+        }
+        result += "\n";
+        writer_->write(result);
     }
 
-    // Trim from the start (in place)
-    static void ltrim(std::string &s) {
-        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+    static void trim(std::string& s) {
+        s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
             return !std::isspace(ch);
         }));
-    }
-
-    // Trim from the end (in place)
-    static void rtrim(std::string &s) {
-        s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+        s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
             return !std::isspace(ch);
         }).base(), s.end());
     }
@@ -81,5 +78,3 @@ private:
     std::stack<std::string> stack;
     int c_block_size;
 };
-
-
